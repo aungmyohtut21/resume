@@ -1,0 +1,108 @@
+---
+name: Aung Myo Htut
+surname: Htut
+docname: "Resume"
+fontawesome: yes
+address: Portland, Maine
+phone: "(314) 441-9671"
+email: dramhtut@gmail.com
+linkedin: aungmyohtut21
+date: "`r format(Sys.time(),'%d %B, %Y')`"
+headcolor: 990000
+aboutme: "Dedicated epidemiologist committed to addressing public health challenges and reducing health inequities through data-driven solutions. This resume itself is a testament to that approach, compiled using code and leveraging data science techniques."
+output: function(...) 
+          {source('price_entries.R');
+          vitae:::set_entry_formats(price_entries);
+          vitae::cv_document(..., template = "pricetemplate.tex")
+          }
+always_allow_html: yes
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+library(tidyverse)
+library(vitae)
+library(magrittr)
+library(tibble)
+library(glue)
+library(lubridate)
+library(rlang)
+```
+
+# Professional Summary
+
+Epidemiologist with extensive experience in data analysis and public health program evaluation to address health inequities by using biostatistics and data science. Skilled in R programming and adept at creating interactive data visualization tools using R Shiny and Power BI, facilitating informed decision-making and policy development. Demonstrates strong capabilities in managing and evaluating healthcare programs across diverse settings, delivering actionable insights to enhance public health outcomes. Seeking to apply expertise in an inclusive academic or public service role.
+
+# Skills
+
+```{r skills,results='asis', width = 40000}
+skills <- readxl::read_excel("data.xlsx", sheet = "skills")
+
+skills_formatted <- skills %>% 
+  mutate(skill = if_else(is.na(details)|details=="", glue("{skill}"), glue("{skill} ({details})"))) %>% 
+  group_by(group) %>% 
+  summarize(skills = glue_collapse(skill, sep = " $\\bullet$ "))
+
+for (group in skills_formatted$group) {
+  cat(
+    glue("\\textbf{<<tools::toTitleCase(group)>>}:", .open = "<<", .close = ">>"),
+    filter(skills_formatted, group == !!group)$skills,
+    "\n\n\n"
+  )
+}
+
+```
+
+# Experience
+
+```{r experience}
+experience <- readxl::read_excel("data.xlsx", sheet = "employment")
+experience %>% detailed_entries(
+    with = with,
+    what = what,
+    why = why,
+    when = glue::glue("{startMonth} {startYear} ---- {endMonth} {endYear}",.na = ""),
+    where = where
+  )
+```
+
+# Education
+
+```{r education}
+education <- readxl::read_excel("data.xlsx", sheet = "education-details")
+
+education %>% 
+  detailed_entries(
+    with = with,
+    what = what,
+    when = when,
+    where = where
+  )
+```
+
+# Scholarship
+```{r scholarship}
+scholarship <- readxl::read_excel("data.xlsx", sheet = "scholarship")
+
+scholarship %>% 
+  detailed_entries(
+    what = what,
+    when = when,
+    with = with
+  )
+```
+
+# Professional Affilications
+```{r}
+affiliations <-readxl::read_excel("data.xlsx", sheet = "affiliations")
+
+affiliations %>% 
+  detailed_entries(
+    what = status,
+    with = org,
+    when = when
+  )
+```
+
